@@ -22,7 +22,7 @@ public class PokemonController : Controller
     }
 
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Pokemon>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<PokemonDTO>))]
     public IActionResult GetAllPokemon()
     {
         var pokemons = this.mapper.Map<List<PokemonDTO>>(this.pokemonRepository.GetPokemons());
@@ -34,7 +34,7 @@ public class PokemonController : Controller
     }
 
     [HttpGet("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Pokemon))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PokemonDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult GetPokemonById(int id)
