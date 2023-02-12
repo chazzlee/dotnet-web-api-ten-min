@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using TenMin.Interfaces;
-using TenMin.Models;
 using AutoMapper;
 using TenMin.DTOs;
 
