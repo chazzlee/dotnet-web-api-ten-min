@@ -23,6 +23,7 @@ public class PokemonController : Controller
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<PokemonDTO>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult GetAllPokemon()
     {
         var pokemons = this.mapper.Map<List<PokemonDTO>>(this.pokemonRepository.GetPokemons());
