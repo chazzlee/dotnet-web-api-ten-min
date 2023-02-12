@@ -11,7 +11,7 @@ namespace TenMin.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CountryController : Controller
+public class CountryController : ControllerBase
 {
     private readonly ICountryRepository countryRepository;
     private readonly IMapper mapper;

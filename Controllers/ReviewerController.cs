@@ -9,7 +9,7 @@ namespace TenMin.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ReviewerController : Controller
+public class ReviewerController : ControllerBase
 {
     private readonly IReviewerRepository reviewerRepository;
     private readonly IMapper mapper;

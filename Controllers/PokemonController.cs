@@ -9,7 +9,7 @@ namespace TenMin.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PokemonController : Controller
+public class PokemonController : ControllerBase
 {
     private readonly IPokemonRepository pokemonRepository;
     private readonly IMapper mapper;

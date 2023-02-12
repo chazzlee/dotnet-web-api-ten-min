@@ -11,7 +11,7 @@ namespace TenMin.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CategoryController : Controller
+public class CategoryController : ControllerBase
 {
     private readonly ICategoryRepository categoryRepository;
     private readonly IMapper mapper;
