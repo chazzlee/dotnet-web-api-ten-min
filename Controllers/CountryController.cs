@@ -81,11 +81,11 @@ public class CountryController : Controller
             return BadRequest(ModelState);
         }
 
-        var countries = this.countryRepository.GetCountries()
+        var country = this.countryRepository.GetCountries()
             .Where(c => c.Name.Trim().ToUpper() == newCountry.Name.TrimEnd().ToUpper())
             .FirstOrDefault();
 
-        if (countries != null)
+        if (country != null)
         {
             ModelState.AddModelError("name", "Country already exists");
             return UnprocessableEntity(ModelState);

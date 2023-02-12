@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TenMin.DTOs;
 using TenMin.Interfaces;
+using TenMin.Models;
 
 namespace TenMin.Controllers;
 
@@ -72,5 +74,42 @@ public class OwnerController : Controller
         }
 
         return Ok(owner);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public IActionResult CreateOwner([FromBody] OwnerDTO newOwner)
+    {
+        if (newOwner == null)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var owner = this.ownerRepository.GetOwners()
+            .Where(o => o.LastName.Trim().ToUpper() == newOwner.LastName.TrimEnd().ToUpper())
+            .FirstOrDefault();
+
+        if (owner != null)
+        {
+            ModelState.AddModelError("name", "Owner already exists");
+            return UnprocessableEntity(ModelState);
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var ownerMap = this.mapper.Map<Owner>(newOwner);
+        if (!this.ownerRepository.CreateOwner(ownerMap))
+        {
+            ModelState.AddModelError("error", "Something went wrong");
+            return StatusCode(StatusCodes.Status500InternalServerError, ModelState);
+        }
+
+        return Ok("Successfully created");
     }
 }

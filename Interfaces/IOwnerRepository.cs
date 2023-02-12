@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using TenMin.Models;
 
@@ -11,4 +10,5 @@ public interface IOwnerRepository
     public ICollection<Owner> GetOwnerOfAPokemon(int pokemonId);
     public ICollection<Pokemon> GetPokemonByOwner(int ownerId);
     public bool OwnerExists(int ownerId);
+    public bool CreateOwner(Owner owner);
 }
