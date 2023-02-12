@@ -14,11 +14,20 @@ namespace TenMin.Controllers;
 public class ReviewController : ControllerBase
 {
     private readonly IReviewRepository reviewRepository;
+    private readonly IReviewerRepository reviewerRepository;
+    private readonly IPokemonRepository pokemonRepository;
     private readonly IMapper mapper;
 
-    public ReviewController(IReviewRepository reviewRepository, IMapper mapper)
+    public ReviewController(
+        IReviewRepository reviewRepository,
+        IReviewerRepository reviewerRepository,
+        IPokemonRepository pokemonRepository,
+        IMapper mapper
+    )
     {
         this.reviewRepository = reviewRepository;
+        this.reviewerRepository = reviewerRepository;
+        this.pokemonRepository = pokemonRepository;
         this.mapper = mapper;
     }
 
@@ -77,7 +86,11 @@ public class ReviewController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult CreateReview([FromBody] ReviewDTO newReview)
+    public IActionResult CreateReview(
+        [FromQuery] int reviewerId,
+        [FromQuery] int pokemonId,
+        [FromBody] ReviewDTO newReview
+    )
     {
         if (newReview == null)
         {
@@ -100,6 +113,13 @@ public class ReviewController : ControllerBase
         }
 
         var reviewMap = this.mapper.Map<Review>(newReview);
+        var pokemon = this.pokemonRepository.GetPokemon(pokemonId);
+        var reviewer = this.reviewerRepository.GetReviewerById(reviewerId);
+        if (pokemon != null && reviewer != null)
+        {
+            reviewMap.Pokemon = pokemon;
+            reviewMap.Reviewer = reviewer;
+        }
 
         if (!this.reviewRepository.CreateReview(reviewMap))
         {
