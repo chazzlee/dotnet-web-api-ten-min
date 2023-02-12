@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TenMin.DTOs;
 using TenMin.Interfaces;
+using TenMin.Models;
 
 namespace TenMin.Controllers;
 
@@ -71,5 +73,42 @@ public class ReviewerController : ControllerBase
         }
 
         return Ok(reviews);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public IActionResult CreateReviewer([FromBody] ReviewerDTO newReviewer)
+    {
+        if (newReviewer == null)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var reviewer = this.reviewerRepository.GetReviewers()
+            .Where(r => r.LastName.Trim().ToUpper() == newReviewer.LastName.TrimEnd().ToUpper())
+            .FirstOrDefault();
+
+        if (reviewer != null)
+        {
+            ModelState.AddModelError("name", "Reviewer already exists");
+            return UnprocessableEntity(ModelState);
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var reviewerMap = this.mapper.Map<Reviewer>(newReviewer);
+        if (!this.reviewerRepository.CreateReviewer(reviewerMap))
+        {
+            ModelState.AddModelError("error", "Something went wrong");
+            return StatusCode(StatusCodes.Status500InternalServerError, ModelState);
+        }
+
+        return Ok("Successfully created");
     }
 }

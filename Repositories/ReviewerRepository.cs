@@ -16,6 +16,12 @@ public class ReviewerRepository : IReviewerRepository
         this.context = context;
     }
 
+    public bool CreateReviewer(Reviewer reviewer)
+    {
+        this.context.Reviewers.Add(reviewer);
+        return Save();
+    }
+
     public Reviewer? GetReviewerById(int id)
     {
         return this.context.Reviewers
