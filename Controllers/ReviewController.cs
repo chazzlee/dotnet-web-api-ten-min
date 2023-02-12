@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TenMin.DTOs;
 using TenMin.Interfaces;
+using TenMin.Models;
 
 namespace TenMin.Controllers;
 
@@ -68,5 +70,43 @@ public class ReviewController : ControllerBase
         }
 
         return Ok(reviews);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public IActionResult CreateReview([FromBody] ReviewDTO newReview)
+    {
+        if (newReview == null)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var review = this.reviewRepository.GetReviews()
+            .Where(r => r.Title.Trim().ToUpper() == newReview.Title.TrimEnd().ToUpper())
+            .FirstOrDefault();
+
+        if (review != null)
+        {
+            ModelState.AddModelError("name", "Review already exists");
+            return UnprocessableEntity(ModelState);
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var reviewMap = this.mapper.Map<Review>(newReview);
+
+        if (!this.reviewRepository.CreateReview(reviewMap))
+        {
+            ModelState.AddModelError("error", "Something went wrong");
+            return StatusCode(StatusCodes.Status500InternalServerError, ModelState);
+        }
+
+        return Ok("Successfully created");
     }
 }

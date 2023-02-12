@@ -10,5 +10,6 @@ public interface IReviewRepository
     public Review? GetReview(int id);
     public ICollection<Review> GetReviewsOfAPokemon(int pokemonId);
     public bool ReviewExists(int id);
+    public bool CreateReview(Review review);
     public bool Save();
 }

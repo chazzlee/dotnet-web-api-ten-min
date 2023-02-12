@@ -15,6 +15,12 @@ public class ReviewRepository : IReviewRepository
         this.context = context;
     }
 
+    public bool CreateReview(Review review)
+    {
+        this.context.Reviews.Add(review);
+        return Save();
+    }
+
     public Review? GetReview(int id)
     {
         return this.context.Reviews.Where(r => r.Id == id).FirstOrDefault();
