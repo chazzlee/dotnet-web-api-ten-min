@@ -9,66 +9,68 @@ namespace TenMin.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CategoryController : Controller
+public class OwnerController : Controller
 {
-    private readonly ICategoryRepository categoryRepository;
+    private readonly IOwnerRepository ownerRepository;
     private readonly IMapper mapper;
 
-    public CategoryController(ICategoryRepository categoryRepository, IMapper mapper)
+    public OwnerController(IOwnerRepository ownerRepository, IMapper mapper)
     {
-        this.categoryRepository = categoryRepository;
+        this.ownerRepository = ownerRepository;
         this.mapper = mapper;
     }
 
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CategoryDTO>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<OwnerDTO>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public IActionResult GetCategories()
+    public IActionResult GetOwners()
     {
-        var categories = this.mapper.Map<List<CategoryDTO>>(this.categoryRepository.GetCategories());
+        var owners = this.mapper.Map<List<OwnerDTO>>(this.ownerRepository.GetOwners());
+
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
-
-        return Ok(categories);
+        return Ok(owners);
     }
 
     [HttpGet("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CategoryDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OwnerDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public IActionResult GetCategory(int id)
+    public IActionResult GetOwnerById(int id)
     {
-        if (!this.categoryRepository.CategoryExists(id))
+        if (!this.ownerRepository.OwnerExists(id))
         {
             return NotFound();
         }
 
-        var category = this.mapper.Map<CategoryDTO>(this.categoryRepository.GetCategory(id));
+        var owner = this.mapper.Map<OwnerDTO>(this.ownerRepository.GetOwner(id));
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        return Ok(category);
+        return Ok(owner);
     }
 
-    [HttpGet("{id}/pokemon")]
+    [HttpGet("{ownerId}/pokemon")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<PokemonDTO>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public IActionResult GetPokemonByCategory(int id)
+    public IActionResult GetPokemonByOwner(int ownerId)
     {
-        var pokemon = this.mapper.Map<List<PokemonDTO>>(
-            this.categoryRepository.GetPokemonByCategory(id)
-        );
+        if (!this.ownerRepository.OwnerExists(ownerId))
+        {
+            return NotFound();
+        }
 
+        var owner = this.mapper.Map<List<PokemonDTO>>(this.ownerRepository.GetPokemonByOwner(ownerId));
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        return Ok(pokemon);
+        return Ok(owner);
     }
 }
