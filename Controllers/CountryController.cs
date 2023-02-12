@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TenMin.DTOs;
 using TenMin.Interfaces;
+using TenMin.Models;
 
 namespace TenMin.Controllers;
 
@@ -65,5 +67,41 @@ public class CountryController : Controller
         }
 
         return Ok(country);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public IActionResult CreateCountry([FromBody] CountryDTO newCountry)
+    {
+        if (newCountry == null)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var countries = this.countryRepository.GetCountries()
+            .Where(c => c.Name.Trim().ToUpper() == newCountry.Name.TrimEnd().ToUpper())
+            .FirstOrDefault();
+
+        if (countries != null)
+        {
+            ModelState.AddModelError("name", "Country already exists");
+            return UnprocessableEntity(ModelState);
+        }
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var countryMap = this.mapper.Map<Country>(newCountry);
+        if (!this.countryRepository.CreateCountry(countryMap))
+        {
+            ModelState.AddModelError("error", "Something went wrong");
+            return StatusCode(StatusCodes.Status500InternalServerError, ModelState);
+        }
+
+        return Ok("Successfully created");
     }
 }

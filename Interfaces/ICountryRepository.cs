@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using TenMin.Models;
 
@@ -11,4 +10,5 @@ public interface ICountryRepository
     public Country? GetCountryByOwner(int ownerId);
     public ICollection<Owner> GetOwnersFromCountry(int countryId);
     public bool CountryExists(int id);
+    public bool CreateCountry(Country country);
 }

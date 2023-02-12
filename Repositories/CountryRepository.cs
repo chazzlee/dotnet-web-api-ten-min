@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TenMin.Data;
@@ -18,6 +19,12 @@ public class CountryRepository : ICountryRepository
     public bool CountryExists(int id)
     {
         return this.context.Countries.Any(c => c.Id == id);
+    }
+
+    public bool CreateCountry(Country country)
+    {
+        this.context.Countries.Add(country);
+        return Save();
     }
 
     public ICollection<Country> GetCountries()
@@ -43,5 +50,11 @@ public class CountryRepository : ICountryRepository
         return this.context.Owners
             .Where(o => o.Country.Id == countryId)
             .ToList();
+    }
+
+    private bool Save()
+    {
+        var saved = this.context.SaveChanges();
+        return saved > 0 ? true : false;
     }
 }

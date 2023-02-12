@@ -26,7 +26,7 @@ public class ReviewerRepository : IReviewerRepository
 
     public ICollection<Reviewer> GetReviewers()
     {
-        return this.context.Reviewers.ToList();
+        return this.context.Reviewers.Include(r => r.Reviews).ToList();
     }
 
     public ICollection<Review> GetReviewsByReviewer(int reviewerId)

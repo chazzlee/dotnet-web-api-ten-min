@@ -1,9 +1,11 @@
+using System.Linq;
 using System.Collections.Generic;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TenMin.DTOs;
 using TenMin.Interfaces;
+using TenMin.Models;
 
 namespace TenMin.Controllers;
 
@@ -70,5 +72,41 @@ public class CategoryController : Controller
         }
 
         return Ok(pokemon);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public IActionResult CreateCategory([FromBody] CategoryDTO newCategory)
+    {
+        if (newCategory == null)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var category = this.categoryRepository.GetCategories()
+            .Where(c => c.Name.Trim().ToUpper() == newCategory.Name.TrimEnd().ToUpper())
+            .FirstOrDefault();
+
+        if (category != null)
+        {
+            ModelState.AddModelError("name", "Category already exists");
+            return UnprocessableEntity(ModelState);
+        }
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var categoryMap = this.mapper.Map<Category>(newCategory);
+        if (!this.categoryRepository.CreateCategory(categoryMap))
+        {
+            ModelState.AddModelError("error", "Something went wrong");
+            return StatusCode(StatusCodes.Status500InternalServerError, ModelState);
+        }
+
+        return Ok("Successfully created");
     }
 }
