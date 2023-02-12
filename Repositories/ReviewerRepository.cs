@@ -40,4 +40,10 @@ public class ReviewerRepository : IReviewerRepository
     {
         return this.context.Reviewers.Any(r => r.Id == id);
     }
+
+    public bool Save()
+    {
+        var saved = this.context.SaveChanges();
+        return saved > 0 ? true : false;
+    }
 }

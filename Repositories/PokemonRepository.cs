@@ -45,4 +45,37 @@ public class PokemonRepository : IPokemonRepository
     {
         return _context.Pokemon.Any(p => p.Id == pokemonId);
     }
+
+    public bool CreatePokemon(int ownerId, int categoryId, Pokemon pokemon)
+    {
+        var owner = _context.Owners.Where(a => a.Id == ownerId).FirstOrDefault();
+        var category = _context.Categories.Where(a => a.Id == categoryId).FirstOrDefault();
+        if (owner == null || category == null)
+        {
+            return false;
+        }
+
+        var pokemonOwner = new PokemonOwner()
+        {
+            Owner = owner,
+            Pokemon = pokemon
+        };
+
+        _context.PokemonOwners.Add(pokemonOwner);
+        var pokemonCategory = new PokemonCategory()
+        {
+            Category = category,
+            Pokemon = pokemon
+        };
+        _context.PokemonCategories.Add(pokemonCategory);
+        _context.Pokemon.Add(pokemon);
+
+        return Save();
+    }
+
+    public bool Save()
+    {
+        var saved = _context.SaveChanges();
+        return saved > 0 ? true : false;
+    }
 }

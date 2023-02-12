@@ -45,7 +45,7 @@ public class CategoryRepository : ICategoryRepository
             .ToList();
     }
 
-    private bool Save()
+    public bool Save()
     {
         var saved = this.context.SaveChanges();
         return saved > 0 ? true : false;

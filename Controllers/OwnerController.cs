@@ -14,11 +14,17 @@ namespace TenMin.Controllers;
 public class OwnerController : ControllerBase
 {
     private readonly IOwnerRepository ownerRepository;
+    private readonly ICountryRepository countryRepository;
     private readonly IMapper mapper;
 
-    public OwnerController(IOwnerRepository ownerRepository, IMapper mapper)
+    public OwnerController(
+        IOwnerRepository ownerRepository,
+        ICountryRepository countryRepository,
+        IMapper mapper
+    )
     {
         this.ownerRepository = ownerRepository;
+        this.countryRepository = countryRepository;
         this.mapper = mapper;
     }
 
@@ -81,7 +87,10 @@ public class OwnerController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult CreateOwner([FromBody] OwnerDTO newOwner)
+    public IActionResult CreateOwner(
+        [FromQuery] int countryId,
+        [FromBody] OwnerDTO newOwner
+    )
     {
         if (newOwner == null)
         {
@@ -104,6 +113,12 @@ public class OwnerController : ControllerBase
         }
 
         var ownerMap = this.mapper.Map<Owner>(newOwner);
+        var country = this.countryRepository.GetCountry(countryId);
+        if (country != null)
+        {
+            ownerMap.Country = country;
+        }
+
         if (!this.ownerRepository.CreateOwner(ownerMap))
         {
             ModelState.AddModelError("error", "Something went wrong");
