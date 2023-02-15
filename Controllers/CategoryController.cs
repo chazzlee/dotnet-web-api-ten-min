@@ -109,4 +109,35 @@ public class CategoryController : ControllerBase
 
         return Ok("Successfully created");
     }
+
+    [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult UpdateCategory(int id, [FromBody] CategoryDTO updatedCategory)
+    {
+        if (updatedCategory == null)
+        {
+            return BadRequest(ModelState);
+        }
+        if (id != updatedCategory.Id)
+        {
+            return BadRequest(ModelState);
+        }
+        if (!this.categoryRepository.CategoryExists(id))
+        {
+            return NotFound();
+        }
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var categoryMap = this.mapper.Map<Category>(updatedCategory);
+        if (!this.categoryRepository.UpdateCategory(categoryMap))
+        {
+            ModelState.AddModelError("", "Something went wrong");
+            return StatusCode(500, ModelState);
+        }
+        return NoContent();
+    }
 }

@@ -11,5 +11,6 @@ public interface ICountryRepository
     public ICollection<Owner> GetOwnersFromCountry(int countryId);
     public bool CountryExists(int id);
     public bool CreateCountry(Country country);
+    public bool UpdateCountry(Country country);
     public bool Save();
 }

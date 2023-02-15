@@ -50,4 +50,10 @@ public class CategoryRepository : ICategoryRepository
         var saved = this.context.SaveChanges();
         return saved > 0 ? true : false;
     }
+
+    public bool UpdateCategory(Category category)
+    {
+        this.context.Categories.Update(category);
+        return Save();
+    }
 }
